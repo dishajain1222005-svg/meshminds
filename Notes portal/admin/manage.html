@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin — Manage Uploads</title>
+
+  <link rel="stylesheet" href="../css/futuristic.css">
+  <link rel="stylesheet" href="../css/theme.css">
+
+  <style>
+    .wrap { max-width:1200px; margin:28px auto; padding:0 18px; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    .section { background:var(--card); padding:18px; border-radius:14px; border:1px solid var(--glass); box-shadow:var(--shadow); margin-top:20px; }
+    .list { display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+    .item { padding:14px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); display:flex; justify-content:space-between; align-items:center; gap:12px; border:1px solid rgba(0,0,0,0.04); }
+    .meta { color:var(--muted); font-size:13px; }
+    .title { font-weight:700; color:var(--text); font-size:18px; }
+    .actions { display:flex; gap:10px; align-items:center; }
+    .danger { background:#ff6b6b; color:white; border:none; padding:8px 12px; border-radius:10px; cursor:pointer; }
+    .small-btn { padding:8px 12px; border-radius:10px; border:none; cursor:pointer; }
+    select,input { padding:8px;border-radius:8px;border:1px solid var(--glass); background:transparent;color:var(--text) }
+    .empty { color:var(--muted); padding:14px; text-align:center; }
+    a.open-link { text-decoration:none; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; padding:8px 12px; border-radius:10px; font-weight:700; }
+  </style>
+</head>
+
+<body>
+
+  <header class="header-hero" style="height:160px;">
+    <img src="../img/hero.png" alt="Hero">
+    <div class="hero-content" style="top:28px; left:28px;">
+      <h1>Admin — Manage Uploads</h1>
+      <p style="color:var(--muted)">View, open or delete uploaded resources</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <div class="top">
+      <div>
+        <div style="font-weight:800;font-size:18px">Manage uploads</div>
+        <div class="meta" id="signedInfo">Checking sign-in...</div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="goAdmin" class="small-btn glow-btn">Open Admin Panel</button>
+        <button id="refreshBtn" class="small-btn glow-btn">Refresh</button>
+      </div>
+    </div>
+
+    <!-- SELECTORS -->
+    <div class="section">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        
+        <div>
+          <label>Course</label>
+          <select id="selCourse"></select>
+        </div>
+
+        <div>
+          <label>Branch</label>
+          <select id="selBranch"></select>
+        </div>
+
+        <div>
+          <label>Semester</label>
+          <select id="selSemester"></select>
+        </div>
+
+        <div>
+          <label>Subject</label>
+          <select id="selSubject"></select>
+        </div>
+
+        <button id="loadBtn" class="glow-btn" style="margin-left:auto">Load uploads</button>
+
+        <div class="meta" id="currentPath"></div>
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div class="section">
+      <div id="itemsList" class="list"></div>
+      <div id="empty" class="empty" style="display:none">No items found.</div>
+    </div>
+
+  </main>
+
+  <!-- IMPORTANT: LOAD firebase BEFORE admin-common -->
+  <script type="module" src="../js/firebase.js"></script>
+  <script type="module" src="../js/admin-common.js"></script>
+
+  <script type="module">
+    import { auth, ADMIN_UID, db } from '../js/firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+    /* DOM */
+    const signedInfo = document.getElementById('signedInfo');
+    const selCourse = document.getElementById('selCourse');
+    const selBranch = document.getElementById('selBranch');
+    const selSemester = document.getElementById('selSemester');
+    const selSubject = document.getElementById('selSubject');
+    const itemsList = document.getElementById('itemsList');
+    const emptyEl = document.getElementById('empty');
+    const currentPath = document.getElementById('currentPath');
+
+    document.getElementById('goAdmin').onclick = () => location.href = "admin.html";
+    document.getElementById('refreshBtn').onclick = () => loadList();
+    document.getElementById('loadBtn').onclick = () => loadList();
+
+    /* ---------- Dropdown content (same as admin) ----------- */
+    const COURSES = ["B.Tech"];
+    const BRANCHES = ["CSE","IT","AIML","AIDS","VLSI"];
+
+    const COMMON_SEM12 = [
+      "Applied Chemistry","Applied Mathematics I","Applied Physics I",
+      "Communication Skills","Engineering Graphics","Engineering Mechanics",
+      "Electrical Science","Environmental Science","Human Values and Professional Ethics",
+      "Indian Constitution","Manufacturing Processes","Programming in C","Workshop Practice"
+    ];
+
+    const SUBJECTS_BY_BRANCH = {
+      CSE:{3:["Digital Logic Design","Discrete Mathematics","Data Structures","Object Oriented Programming","Probability, Statistics & Linear Algebra","Foundation of Data Science","Principles of Artificial Intelligence","Computational Methods","Universal Human Values II"],4:["Design and Analysis of Algorithms","Database Management Systems","Computer Organization","Operating Systems","Computer Networks","Software Engineering","Numerical Methods"]},
+      IT:{3:["Digital Logic Design","Discrete Mathematics","Data Structures","Object Oriented Programming","Probability, Statistics & Linear Algebra","Foundation of Data Science","Principles of Artificial Intelligence","Computational Methods","Universal Human Values II"],4:["Database Management Systems","Operating Systems","Computer Networks","Web Technologies","Software Engineering","Internet of Things (Intro)"]},
+      AIML:{3:["Data Structures","Discrete Mathematics","Probability, Statistics & Linear Algebra","Object Oriented Programming","Foundation of Data Science","Principles of Artificial Intelligence","Machine Learning Basics","Universal Human Values II"],4:["Machine Learning I","Data Mining","Linear Algebra for ML","Statistics for ML","Python for Data Science"]},
+      AIDS:{3:["Data Structures","Discrete Mathematics","Probability, Statistics & Linear Algebra","Object Oriented Programming","Foundation of Data Science","Principles of Artificial Intelligence","Data Analysis Basics","Universal Human Values II"],4:["Machine Learning I","Data Visualization","APIs & Data Engineering Basics","Intro to Neural Networks"]},
+      VLSI:{3:["Digital Logic Design","Electronic Devices and Circuits","Signals and Systems (intro)","Fundamentals of VLSI","Discrete Mathematics","Computational Methods"],4:["VLSI Design Basics","CMOS Technology","Microprocessors and Interfacing","Analog Circuits"]}
+    };
+
+    function loadDropdowns(){
+      selCourse.innerHTML = COURSES.map(c=>`<option>${c}</option>`).join('');
+      selBranch.innerHTML = BRANCHES.map(b=>`<option>${b}</option>`).join('');
+      selSemester.innerHTML = [1,2,3,4].map(n=>`<option value="${n}">Semester ${n}</option>`).join('');
+      fillSubjects();
+      updatePath();
+    }
+
+    function fillSubjects(){
+      const branch = selBranch.value;
+      const sem = Number(selSemester.value);
+      selSubject.innerHTML = "";
+
+      let arr = [];
+      if(sem === 1 || sem === 2) arr = COMMON_SEM12;
+      else arr = SUBJECTS_BY_BRANCH[branch]?.[sem] || [];
+
+      arr.forEach(s=>{
+        const o = document.createElement('option');
+        o.value = s;
+        o.textContent = s;
+        selSubject.appendChild(o);
+      });
+
+      selSubject.appendChild(new Option("— Add / Other —","__other__"));
+    }
+
+    function updatePath(){
+      currentPath.textContent =
+        `${selCourse.value} • ${selBranch.value} • Semester ${selSemester.value} • ${selSubject.value}`;
+    }
+
+    selBranch.onchange = ()=>{ fillSubjects(); updatePath(); };
+    selSemester.onchange = ()=>{ fillSubjects(); updatePath(); };
+    selCourse.onchange = updatePath;
+    selSubject.onchange = updatePath;
+
+    loadDropdowns();
+
+    /* ---------- AUTH ----------- */
+    onAuthStateChanged(auth, user=>{
+      if(!user){
+        signedInfo.innerText = "Not signed in — open Admin Panel";
+        itemsList.innerHTML = "";
+        emptyEl.style.display = "block";
+        emptyEl.innerText = "Login first.";
+        return;
+      }
+
+      if(user.uid !== ADMIN_UID){
+        signedInfo.innerText = user.email + " — NOT AUTHORIZED";
+        itemsList.innerHTML = "";
+        emptyEl.style.display = "block";
+        emptyEl.innerText = "Not allowed.";
+        return;
+      }
+
+      signedInfo.innerText = "Signed in as " + user.email;
+      loadList();
+    });
+
+    /* ---------- LOAD LIST (uses admin-common.js helper) ----------- */
+    async function loadList(){
+      const subj = selSubject.value;
+      if(subj === "__other__"){
+        alert("Select a subject");
+        return;
+      }
+
+      const docId = `${selCourse.value}__${selBranch.value}__Semester ${selSemester.value}__${subj}`;
+
+      if(window.adminHelpers){
+        await window.adminHelpers.listUploadsFor(docId, "itemsList");
+      }
+
+      if(itemsList.children.length === 0){
+        emptyEl.style.display = "block";
+      } else {
+        emptyEl.style.display = "none";
+      }
+    }
+
+  </script>
+
+  <script type="module" src="../js/theme.js"></script>
+
+</body>
+</html>

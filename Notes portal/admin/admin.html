@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin Panel</title>
+
+  <link rel="stylesheet" href="../css/futuristic.css">
+  <link rel="stylesheet" href="../css/theme.css">
+
+  <style>
+    .tabs { display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap }
+    .tab { padding:10px 14px; border-radius:12px; cursor:pointer; background:linear-gradient(90deg,#1f2937,#111827); color:#fff; }
+    .tab.active{ box-shadow:0 10px 40px rgba(0,0,0,0.45); transform:translateY(-4px) }
+    .tabpanel{ display:none; margin-top:12px }
+    .tabpanel.active{ display:block }
+
+    .grid { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+
+    select,input,textarea{
+      padding:10px;border-radius:10px;border:1px solid var(--glass);
+      width:100%; background:transparent;color:var(--text);
+    }
+
+    #currentPath { font-weight:600;margin-top:6px;color:var(--accent-2) }
+  </style>
+</head>
+
+<body>
+<header style="padding:18px;text-align:center;background:var(--card)">
+  <h1>Admin Panel</h1>
+</header>
+
+<main style="max-width:1100px;margin:20px auto;padding:0 16px;">
+<div class="card">
+
+  <!-- LOGIN -->
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+    <div><strong>Signed in as:</strong> <span id="signedAs">Not signed in</span></div>
+
+    <div style="display:flex;gap:8px;">
+      <input id="adminEmail" placeholder="admin@example.com">
+      <input id="adminPass" placeholder="password" type="password">
+      <button id="loginBtn" class="glow-btn">Login</button>
+      <button id="logoutBtn" class="glow-btn" style="background:#ff6b6b;display:none">Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- DROPDOWNS -->
+<div class="card" style="margin-top:16px;">
+  <h3>Select Course / Branch / Semester / Subject</h3>
+
+  <div class="grid">
+    <select id="selCourse"></select>
+    <select id="selBranch"></select>
+    <select id="selSemester"></select>
+    <select id="selSubject"></select>
+  </div>
+
+  <p id="currentPath"></p>
+
+  <div style="margin-top:12px;display:flex;gap:10px;">
+    <input id="newSubject" placeholder="Add new subject">
+    <button id="addSubjectBtn" class="glow-btn">Add Subject</button>
+
+    <!-- FIXED PATH -->
+    <button id="manageBtn" class="glow-btn" style="display:none;">Manage Uploads</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="card" style="margin-top:16px;">
+  <div class="tabs">
+    <div class="tab active" data-tab="syllabus">Syllabus</div>
+    <div class="tab" data-tab="notes">Notes</div>
+    <div class="tab" data-tab="pyq">PYQ</div>
+    <div class="tab" data-tab="videos">Videos</div>
+    <div class="tab" data-tab="practicals">Practicals</div>
+  </div>
+
+  <!-- PANELS -->
+  <div id="syllabus" class="tabpanel active">
+    <textarea id="s_u1" rows="2" placeholder="Unit 1"></textarea>
+    <textarea id="s_u2" rows="2" placeholder="Unit 2"></textarea>
+    <textarea id="s_u3" rows="2" placeholder="Unit 3"></textarea>
+    <textarea id="s_u4" rows="2" placeholder="Unit 4"></textarea>
+    <button id="s_save" class="glow-btn">Save Syllabus</button>
+    <span id="s_msg"></span>
+  </div>
+
+  <div id="notes" class="tabpanel">
+    <input id="n_title" placeholder="Notes title">
+    <textarea id="n_desc" rows="2" placeholder="Description"></textarea>
+    <input id="n_link" placeholder="Drive link">
+    <button id="n_save" class="glow-btn">Save Note</button>
+    <span id="n_msg"></span>
+  </div>
+
+  <div id="pyq" class="tabpanel">
+    <input id="p_title" placeholder="PYQ title">
+    <input id="p_link" placeholder="Drive link">
+    <button id="p_save" class="glow-btn">Save PYQ</button>
+    <span id="p_msg"></span>
+  </div>
+
+  <div id="videos" class="tabpanel">
+    <input id="v_title" placeholder="Video / Playlist Title">
+    <input id="v_link" placeholder="YouTube link">
+    <button id="v_save" class="glow-btn">Save Video</button>
+    <span id="v_msg"></span>
+  </div>
+
+  <div id="practicals" class="tabpanel">
+    <input id="r_title" placeholder="Practical Title">
+    <textarea id="r_desc" rows="2" placeholder="Procedure / Info"></textarea>
+    <input id="r_link" placeholder="Drive link">
+    <button id="r_save" class="glow-btn">Save Practical</button>
+    <span id="r_msg"></span>
+  </div>
+
+</div>
+
+</main>
+
+<!-- FIXED LOAD ORDER -->
+<script type="module" src="../js/firebase.js"></script>
+<script type="module" src="../js/admin-common.js"></script>
+<script type="module" src="../js/theme.js"></script>
+
+</body>
+</html>
