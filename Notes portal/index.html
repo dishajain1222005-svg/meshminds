@@ -3,81 +3,449 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Notes Portal — Home</title>
-
+  <title>MeshMinds – Your One-Stop Academic Learning Hub</title>
+  <meta name="description" content="MeshMinds provides B.Tech notes, PYQ papers, practical files, syllabus, and video lectures for CSE, IT, AIML, AIDS, and VLSI students.">
+  <meta name="author" content="MeshMinds">
+  <link rel="icon" type="image/png" href="img/favicon.png">
   <link rel="stylesheet" href="css/futuristic.css">
   <link rel="stylesheet" href="css/theme.css">
-  <title>MeshMinds – B.Tech Notes, PYQs, Practicals, Syllabus</title>
 
-<meta name="description" content="MeshMinds provides high-quality B.Tech notes, PYQ papers, practical files, syllabus, and video lectures for CSE, IT, AIML, AIDS, and VLSI students.">
-<meta name="keywords" content="B.Tech Notes, PYQ, Practicals, Syllabus, CSE Notes, IT Notes, AIML Notes, Engineering Notes, Study Material">
-<meta name="author" content="MeshMinds">
+  <style>
+    /* ── HERO ──────────────────────────────────────── */
+    body { padding-top: 0; }
+
+    /* ── ACCESS CARDS ──────────────────────────────── */
+    .access-card {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    }
+    .access-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg), var(--shadow-glow); border-color: var(--glass-border); }
+
+    .access-card::before {
+      content:'';
+      position:absolute;
+      top:-60px; right:-60px;
+      width:180px; height:180px;
+      border-radius:50%;
+      opacity:0.07;
+      pointer-events:none;
+    }
+    .access-card.ac-btech::before { background: var(--purple); }
+    .access-card.ac-admin::before { background: var(--blue); }
+
+    .access-icon {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+    .ac-btech .access-icon { background: rgba(129,85,255,0.15); }
+    .ac-admin .access-icon { background: rgba(40,200,255,0.12); }
+
+    .access-tag {
+      display:inline-block;
+      font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.8px;
+      padding:3px 12px; border-radius:50px;
+      margin-bottom:12px;
+    }
+    .ac-btech .access-tag { background:rgba(129,85,255,0.1); color:var(--purple); border:1px solid rgba(129,85,255,0.2); }
+    .ac-admin .access-tag { background:rgba(40,200,255,0.1);  color:var(--blue);   border:1px solid rgba(40,200,255,0.2); }
+
+    .access-title { font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:8px; }
+    .access-desc  { font-size:14px; color:var(--text-2); line-height:1.65; margin-bottom:24px; }
+
+    .access-tags  { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:24px; }
+    .access-chip  {
+      font-size:11px; font-weight:600; padding:3px 10px;
+      border-radius:6px; background:var(--bg-2);
+      color:var(--muted); border:1px solid var(--border);
+    }
+
+    /* ── FEATURES ──────────────────────────────────── */
+    .features-bg {
+      background: var(--bg-2);
+      border-radius: var(--radius-xl);
+      padding: 60px 48px;
+    }
+
+    @media (max-width:768px) {
+      .features-bg { padding: 36px 20px; border-radius: var(--radius-lg); }
+      .access-card { padding: 26px 22px; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Theme Switch -->
-  <div style="position:fixed;right:20px;top:15px;z-index:200;">
-    <button id="light" style="padding:8px 12px;border-radius:8px;border:none;background:white;color:#222;cursor:pointer">🌞</button>
-    <button id="dark" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.4);background:#111827;color:white;cursor:pointer">🌙</button>
-  </div>
+  <!-- ═══════════════════════════════════════════════
+       NAVBAR (injected by navbar.js)
+  ════════════════════════════════════════════════ -->
 
-  <!-- Hero -->
-  <header class="header-hero">
-    <img src="img/hero.png" alt="Hero">
-    <div class="hero-content">
-      <h1>Notes Portal</h1>
-      <p>B.Tech • CSE / IT / AIML / AIDS / VLSI</p>
+  <!-- ═══════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════════ -->
+  <section class="hero-section" id="home">
+    <div class="hero-inner">
+
+      <!-- Left: copy -->
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span></span>
+          Academic Excellence Platform
+        </div>
+
+        <h1 class="hero-h1">
+          Learn Smarter<br>with <span class="grad">MeshMinds</span>
+        </h1>
+
+        <p class="hero-tagline">
+          Your One-Stop Academic Learning Hub. Access B.Tech notes, PYQ papers,
+          practicals, syllabus, and video lectures — all in one place.
+        </p>
+
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-lg" id="heroBTechBtn">
+            🎓 Explore B.Tech
+          </button>
+          <a class="btn btn-outline btn-lg" href="#features">
+            Learn More ↓
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num" data-count="5" data-suffix="+">5+</div>
+            <div class="hero-stat-label">Branches</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" data-count="4" data-suffix=" Sem">4 Sem</div>
+            <div class="hero-stat-label">Covered</div>
+          </div>
+          <div>
+            <div class="hero-stat-num" data-count="5" data-suffix="">5</div>
+            <div class="hero-stat-label">Resource Types</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: 3D canvas -->
+      <div class="hero-right">
+        <canvas id="heroCanvas"></canvas>
+
+        <!-- Floating info cards -->
+        <div class="float-card" style="top:12%;left:-8%">
+          <div class="float-card-icon purple">📝</div>
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Available</div>
+            <div>Study Notes</div>
+          </div>
+        </div>
+
+        <div class="float-card" style="bottom:18%;right:-6%">
+          <div class="float-card-icon blue">🎥</div>
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Watch</div>
+            <div>Video Lectures</div>
+          </div>
+        </div>
+
+        <div class="float-card" style="bottom:4%;left:5%">
+          <div class="float-card-icon green">📚</div>
+          <div>
+            <div style="font-size:12px;color:var(--muted)">Download</div>
+            <div>PYQ Papers</div>
+          </div>
+        </div>
+      </div>
+
     </div>
-  </header>
+  </section>
 
-  <main>
-    <section class="grid center">
-
-      <!-- BTECH -->
-      <div class="card large-panel">
-        <div>
-          <div class="card-accent accent-purple">B.Tech</div>
-          <div class="card-title">Bachelor of Technology</div>
-          <div class="card-desc">Computer Science, IT, AI & Data Science, VLSI — Sem 1 to 4</div>
-        </div>
-
-        <div class="card-footer">
-          <small class="small">Start here</small>
-          <button class="glow-btn" id="openCourseBtn">Open</button>
-        </div>
+  <!-- ═══════════════════════════════════════════════
+       ACCESS CARDS
+  ════════════════════════════════════════════════ -->
+  <section class="section" id="explore">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:48px">
+        <div class="section-label reveal">🎓 Get Started</div>
+        <h2 class="section-h2 reveal reveal-delay-1">
+          Choose Your <span class="grad">Learning Path</span>
+        </h2>
+        <p class="section-sub reveal reveal-delay-2" style="margin:0 auto">
+          Access curated academic resources or manage content as an administrator.
+        </p>
       </div>
 
-      <!-- ADMIN -->
-      <div class="card large-panel">
-        <div>
-          <div class="card-accent accent-green">Admin</div>
-          <div class="card-title">Admin Panel</div>
-          <div class="card-desc">Upload syllabus, notes, PYQ, videos & practicals (Admin only)</div>
+      <div class="grid grid-2 reveal reveal-delay-2" style="max-width:860px;margin:0 auto;">
+
+        <!-- B.Tech -->
+        <div class="access-card ac-btech">
+          <div class="access-icon">🎓</div>
+          <div class="access-tag">B.Tech Student</div>
+          <div class="access-title">Bachelor of Technology</div>
+          <div class="access-desc">
+            Access complete study material for CSE, IT, AIML, AIDS and VLSI — from Semester 1 to 4.
+          </div>
+          <div class="access-tags">
+            <span class="access-chip">CSE</span>
+            <span class="access-chip">IT</span>
+            <span class="access-chip">AIML</span>
+            <span class="access-chip">AIDS</span>
+            <span class="access-chip">VLSI</span>
+            <span class="access-chip">Sem 1–4</span>
+          </div>
+          <button class="btn btn-primary" id="accessBTechBtn" style="width:100%">
+            Get Started →
+          </button>
         </div>
 
-        <div class="card-footer">
-          <small class="small">Restricted</small>
-          <button class="glow-btn" id="openAdminBtn">Admin</button>
+        <!-- Admin -->
+        <div class="access-card ac-admin">
+          <div class="access-icon">⚙️</div>
+          <div class="access-tag">Administrator</div>
+          <div class="access-title">Admin Panel</div>
+          <div class="access-desc">
+            Upload and manage syllabus, notes, PYQ papers, videos, and practicals. Authorized access only.
+          </div>
+          <div class="access-tags">
+            <span class="access-chip">Upload Notes</span>
+            <span class="access-chip">Manage PYQs</span>
+            <span class="access-chip">Videos</span>
+            <span class="access-chip">Syllabus</span>
+          </div>
+          <button class="btn btn-outline" id="accessAdminBtn" style="width:100%">
+            Admin Login →
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FEATURES
+  ════════════════════════════════════════════════ -->
+  <section class="section" id="features" style="padding-top:0">
+    <div class="section-inner">
+      <div class="features-bg">
+        <div style="text-align:center;margin-bottom:48px">
+          <div class="section-label reveal">✨ Why MeshMinds</div>
+          <h2 class="section-h2 reveal reveal-delay-1">
+            Everything You Need to <span class="grad">Succeed</span>
+          </h2>
+        </div>
+
+        <div class="grid grid-4 gap-20" style="gap:20px">
+
+          <div class="feature-card reveal">
+            <div class="feature-icon fi-purple">📝</div>
+            <div class="feature-title">Study Resources</div>
+            <div class="feature-desc">Detailed unit-wise notes and reference material uploaded by faculty.</div>
+          </div>
+
+          <div class="feature-card reveal reveal-delay-1">
+            <div class="feature-icon fi-blue">🎥</div>
+            <div class="feature-title">Video Lectures</div>
+            <div class="feature-desc">Curated YouTube playlists and video lectures for every subject.</div>
+          </div>
+
+          <div class="feature-card reveal reveal-delay-2">
+            <div class="feature-icon fi-green">🔬</div>
+            <div class="feature-title">Practical Programs</div>
+            <div class="feature-desc">Lab manuals, experiment guides, and downloadable practical files.</div>
+          </div>
+
+          <div class="feature-card reveal reveal-delay-3">
+            <div class="feature-icon fi-orange">📘</div>
+            <div class="feature-title">Updated Syllabus</div>
+            <div class="feature-desc">Unit-wise syllabus with current course structure for all branches.</div>
+          </div>
+
         </div>
       </div>
+    </div>
+  </section>
 
-    </section>
-  </main>
-
-  <footer style="text-align:center;padding:20px;color:var(--muted);margin-top:40px;">
-    © Notes Portal
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div style="margin-bottom:6px">
+      <strong style="color:var(--text)">MeshMinds</strong> — Your One-Stop Academic Learning Hub
+    </div>
+    © 2024 MeshMinds. All rights reserved.
   </footer>
 
+  <!-- ═══════════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════════ -->
+  <script type="module" src="js/navbar.js"></script>
   <script type="module" src="js/theme.js"></script>
+  <script src="js/ui.js" defer></script>
 
+  <!-- Three.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+  <!-- Page logic -->
   <script>
-    document.getElementById("openCourseBtn").onclick = () => {
-      localStorage.setItem("selectedCourse", "B.Tech");
-      location.href = "course.html";
-    };
-    document.getElementById("openAdminBtn").onclick = () => {
-      location.href = "admin/admin.html";
-    };
+    // Navigation
+    document.getElementById('heroBTechBtn').onclick   = () => { localStorage.setItem('selectedCourse','B.Tech'); location.href='course.html'; };
+    document.getElementById('accessBTechBtn').onclick = () => { localStorage.setItem('selectedCourse','B.Tech'); location.href='course.html'; };
+    document.getElementById('accessAdminBtn').onclick = () => { location.href='admin/admin.html'; };
+  </script>
+
+  <!-- 3D Hero Canvas -->
+  <script>
+  (function () {
+    const canvas = document.getElementById('heroCanvas');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    const W = canvas.clientWidth  || 540;
+    const H = canvas.clientHeight || 440;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(W, H);
+    renderer.setClearColor(0x000000, 0);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 100);
+    camera.position.set(0, 0, 5);
+
+    // Lights
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambient);
+
+    const dirLight = new THREE.DirectionalLight(0x8155ff, 2);
+    dirLight.position.set(3, 4, 5);
+    scene.add(dirLight);
+
+    const ptLight = new THREE.PointLight(0x28c8ff, 3, 20);
+    ptLight.position.set(-3, 2, 3);
+    scene.add(ptLight);
+
+    // ── Torus knot (central object) ──────────────────
+    const knotGeo = new THREE.TorusKnotGeometry(1.1, 0.35, 160, 20);
+    const knotMat = new THREE.MeshStandardMaterial({
+      color: 0x8155ff,
+      roughness: 0.3,
+      metalness: 0.7,
+      emissive: 0x28c8ff,
+      emissiveIntensity: 0.08
+    });
+    const knot = new THREE.Mesh(knotGeo, knotMat);
+    scene.add(knot);
+
+    // ── Wireframe sphere (outer shell) ───────────────
+    const sphereGeo = new THREE.SphereGeometry(1.95, 24, 24);
+    const wireMat   = new THREE.MeshBasicMaterial({
+      color: 0x28c8ff,
+      wireframe: true,
+      opacity: 0.08,
+      transparent: true
+    });
+    const wireSphere = new THREE.Mesh(sphereGeo, wireMat);
+    scene.add(wireSphere);
+
+    // ── Floating particles ───────────────────────────
+    const particleCount = 180;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const r = 2.4 + Math.random() * 1.8;
+      const theta = Math.random() * Math.PI * 2;
+      const phi   = Math.acos(2 * Math.random() - 1);
+      positions[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+    }
+    const ptGeo = new THREE.BufferGeometry();
+    ptGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const ptMat = new THREE.PointsMaterial({ color: 0xa86bff, size: 0.04, transparent: true, opacity: 0.7 });
+    scene.add(new THREE.Points(ptGeo, ptMat));
+
+    // ── Small orbiting cubes ─────────────────────────
+    const cubes = [];
+    const cubeColors = [0x8155ff, 0x28c8ff, 0xb15cff, 0x4fffff];
+    for (let i = 0; i < 6; i++) {
+      const s = 0.08 + Math.random() * 0.14;
+      const geo = new THREE.BoxGeometry(s, s, s);
+      const mat = new THREE.MeshStandardMaterial({
+        color: cubeColors[i % cubeColors.length],
+        metalness: 0.8,
+        roughness: 0.2
+      });
+      const cube = new THREE.Mesh(geo, mat);
+      const radius = 2.0 + Math.random() * 0.8;
+      const angle  = (i / 6) * Math.PI * 2;
+      cube.position.set(Math.cos(angle) * radius, (Math.random() - 0.5) * 2, Math.sin(angle) * radius);
+      cube.userData = { angle, radius, speed: 0.3 + Math.random() * 0.4, yOff: cube.position.y };
+      scene.add(cube);
+      cubes.push(cube);
+    }
+
+    // ── Mouse interaction ────────────────────────────
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    // ── Resize handler ───────────────────────────────
+    const resizeObs = new ResizeObserver(() => {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (w && h) {
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+    });
+    resizeObs.observe(canvas);
+
+    // ── Animate ──────────────────────────────────────
+    let clock = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      clock += 0.012;
+
+      knot.rotation.x = clock * 0.4;
+      knot.rotation.y = clock * 0.6;
+      knot.rotation.z = clock * 0.15;
+
+      wireSphere.rotation.y = -clock * 0.1;
+      wireSphere.rotation.x = clock * 0.05;
+
+      // Subtle camera drift toward mouse
+      camera.position.x += (mouseX * 0.6 - camera.position.x) * 0.03;
+      camera.position.y += (-mouseY * 0.4 - camera.position.y) * 0.03;
+      camera.lookAt(scene.position);
+
+      // Orbiting cubes
+      cubes.forEach((cube) => {
+        cube.userData.angle += cube.userData.speed * 0.008;
+        const a = cube.userData.angle;
+        const r = cube.userData.radius;
+        cube.position.x = Math.cos(a) * r;
+        cube.position.z = Math.sin(a) * r;
+        cube.position.y = cube.userData.yOff + Math.sin(clock * 1.2 + a) * 0.3;
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.015;
+      });
+
+      // Pulse emissive
+      knotMat.emissiveIntensity = 0.06 + Math.sin(clock * 2) * 0.04;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  })();
   </script>
 
 </body>

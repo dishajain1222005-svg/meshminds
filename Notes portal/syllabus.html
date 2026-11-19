@@ -1,66 +1,86 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Syllabus</title>
-
-<link rel="stylesheet" href="css/futuristic.css">
-<link rel="stylesheet" href="css/theme.css">
-
-<style>
-.page-box {
-  max-width: 900px;
-  margin: 40px auto;
-  background: var(--card);
-  padding: 26px;
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-}
-.back-btn {
-  padding: 8px 16px;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 10px;
-  border:none;
-  cursor:pointer;
-}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Syllabus — MeshMinds</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="stylesheet" href="css/futuristic.css">
+  <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/theme.js"></script>
 
-<header class="header-hero">
-  <img src="img/hero.png">
-  <div class="hero-content">
-    <h1>Syllabus</h1>
-    <p id="path"></p>
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-nav" style="padding:0 0 16px;">
+        <a class="back-btn" href="subject-options.html">← Back</a>
+        <div class="breadcrumb" id="crumb">Loading…</div>
+      </div>
+      <div class="page-header-eyebrow">📘 Syllabus</div>
+      <div class="page-header-title" id="subjectHeading">Loading…</div>
+      <div class="page-header-sub" id="path">Loading…</div>
+    </div>
   </div>
-</header>
 
-<div class="page-box">
-  <h2 id="title"></h2>
-  <p>Below is the syllabus PDF / link:</p>
+  <div class="page-content" style="max-width:860px">
+    <div id="syllabusContent">
+      <div class="loading-pulse"><span></span><span></span><span></span></div>
+    </div>
+  </div>
 
-  <div id="contentBox"></div>
+  <footer class="site-footer">© 2024 MeshMinds</footer>
+  <script src="js/ui.js" defer></script>
+  <script type="module">
+    import { db } from './js/firebase.js';
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-  <br><button class="back-btn" onclick="history.back()">⬅ Back</button>
-</div>
+    const course  = localStorage.getItem('selectedCourse')   || 'B.Tech';
+    const branch  = localStorage.getItem('selectedBranch')   || '';
+    const sem     = localStorage.getItem('selectedSemester') || '';
+    const subject = localStorage.getItem('selectedSubject')  || '';
 
-<script type="module" src="js/theme.js"></script>
-<script>
-const course  = localStorage.getItem("selectedCourse");
-const branch  = localStorage.getItem("selectedBranch");
-const sem     = localStorage.getItem("selectedSemester");
-const subject = localStorage.getItem("selectedSubject");
+    document.getElementById('subjectHeading').innerText = subject + ' — Syllabus';
+    document.getElementById('path').innerText = `${branch} · ${sem}`;
+    document.getElementById('crumb').innerHTML =
+      `<span>${course}</span> → <span>${branch}</span> → <span>${sem}</span> → <span>${subject}</span> → Syllabus`;
 
-document.getElementById("path").innerText = `${course} • ${branch} • ${sem}`;
-document.getElementById("title").innerText = subject + " - Syllabus";
+    const out = document.getElementById('syllabusContent');
 
-// LOAD FROM FIREBASE LATER — for now placeholder
-document.getElementById("contentBox").innerHTML = `
-  <a href="#" style="color:var(--accent-2);font-weight:700;">Upload syllabus from admin panel</a>
-`;
-</script>
+    async function load() {
+      try {
+        const docId = `${course}__${branch}__${sem}__${subject}`;
+        const snap  = await getDoc(doc(db,'syllabus',docId));
 
+        if (!snap.exists()) {
+          out.innerHTML = emptyState('No syllabus uploaded yet.');
+          return;
+        }
+
+        const data  = snap.data();
+        const units = [1,2,3,4].map(n => ({ label:`Unit ${n}`, value:data[`unit${n}`]||'' })).filter(u => u.value.trim());
+
+        if (!units.length) { out.innerHTML = emptyState('Syllabus content not filled yet.'); return; }
+
+        out.innerHTML = units.map((u,i) => `
+          <div class="unit-block reveal reveal-delay-${i}">
+            <div class="unit-label">${esc(u.label)}</div>
+            <div class="unit-text">${esc(u.value)}</div>
+          </div>`).join('');
+
+        // trigger reveal
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+      } catch(e) {
+        out.innerHTML = errorState(e.message);
+      }
+    }
+
+    function emptyState(msg) { return `<div class="empty-state"><div class="empty-icon">📭</div><p>${msg}</p></div>`; }
+    function errorState(msg) { return `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${esc(msg)}</p></div>`; }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    load();
+  </script>
 </body>
 </html>

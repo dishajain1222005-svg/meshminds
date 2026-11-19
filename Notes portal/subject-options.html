@@ -1,42 +1,102 @@
 <!doctype html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Subject Options</title>
-<link rel="stylesheet" href="css/futuristic.css"><link rel="stylesheet" href="css/theme.css"></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Resources — MeshMinds</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="stylesheet" href="css/futuristic.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    .option-card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 28px 26px;
+      cursor: pointer;
+      transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+      position: relative;
+      overflow: hidden;
+    }
+    .option-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      opacity:0; transition: opacity 0.22s;
+    }
+    .option-card:hover { transform: translateY(-7px); box-shadow: var(--shadow-lg); border-color: var(--glass-border); }
+    .option-card:hover::before { opacity: 1; }
+
+    .oc-syllabus::before   { background: linear-gradient(90deg,#6366f1,#818cf8); }
+    .oc-notes::before      { background: linear-gradient(90deg,var(--purple),var(--violet)); }
+    .oc-pyq::before        { background: linear-gradient(90deg,var(--blue),#38bdf8); }
+    .oc-videos::before     { background: linear-gradient(90deg,#f97316,#fbbf24); }
+    .oc-practicals::before { background: linear-gradient(90deg,#00c9a7,#22c55e); }
+
+    .option-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:16px; }
+    .oi-syllabus   { background:rgba(99,102,241,0.12); }
+    .oi-notes      { background:rgba(129,85,255,0.12); }
+    .oi-pyq        { background:rgba(40,200,255,0.12); }
+    .oi-videos     { background:rgba(249,115,22,0.12); }
+    .oi-practicals { background:rgba(0,201,167,0.12); }
+
+    .option-title { font-size:18px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .option-desc  { font-size:13px; color:var(--text-2); line-height:1.55; }
+  </style>
+</head>
 <body>
-  <header class="header-hero">
-    <img src="img/hero.png" alt="Hero">
-    <div class="hero-content"><h1 id="subjectTitle"></h1><p id="subjectContext"></p></div>
-  </header>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/theme.js"></script>
 
-  <main>
-    <section class="grid center" id="optionsGrid"></section>
-  </main>
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-nav" style="padding:0 0 16px;">
+        <a class="back-btn" href="subject.html">← Subjects</a>
+        <div class="breadcrumb" id="crumb">Loading…</div>
+      </div>
+      <div class="page-header-eyebrow">Resources</div>
+      <div class="page-header-title" id="subjectTitle">Subject</div>
+      <div class="page-header-sub" id="subjectContext">Loading…</div>
+    </div>
+  </div>
 
+  <div class="page-content">
+    <div class="grid grid-auto" style="gap:20px" id="optionsGrid"></div>
+  </div>
+
+  <footer class="site-footer">© 2024 MeshMinds</footer>
+  <script src="js/ui.js" defer></script>
   <script>
-    const subj = localStorage.getItem('selectedSubject') || 'Subject';
-    const branch = localStorage.getItem('selectedBranch') || '';
-    const sem = localStorage.getItem('selectedSemester') || '';
-    document.getElementById('subjectTitle').innerText = subj;
-    document.getElementById('subjectContext').innerText = `${branch} • ${sem}`;
-    const grid = document.getElementById('optionsGrid');
+    const subj   = localStorage.getItem('selectedSubject')  || 'Subject';
+    const branch = localStorage.getItem('selectedBranch')   || '';
+    const sem    = localStorage.getItem('selectedSemester') || '';
+    const course = localStorage.getItem('selectedCourse')   || 'B.Tech';
+
+    document.getElementById('subjectTitle').innerText   = subj;
+    document.getElementById('subjectContext').innerText = `${branch} · ${sem}`;
+    document.getElementById('crumb').innerHTML =
+      `<span>${course}</span> → <span>${branch}</span> → <span>${sem}</span> → <span>${subj}</span>`;
+
     const opts = [
-      {k:'syllabus', t:'📘 Syllabus'},
-      {k:'notes', t:'📝 Notes'},
-      {k:'pyq', t:'📚 PYQ'},
-      {k:'videos', t:'🎥 Videos'},
-      {k:'practicals', t:'🔬 Practicals'}
+      { k:'syllabus',   t:'Syllabus',    icon:'📘', ic:'oi-syllabus',   oc:'oc-syllabus',   desc:'Unit-wise syllabus and course structure' },
+      { k:'notes',      t:'Notes',       icon:'📝', ic:'oi-notes',      oc:'oc-notes',      desc:'Study notes and downloadable reference material' },
+      { k:'pyq',        t:'PYQ Papers',  icon:'📚', ic:'oi-pyq',        oc:'oc-pyq',        desc:'Previous year question papers for exam prep' },
+      { k:'videos',     t:'Videos',      icon:'🎥', ic:'oi-videos',     oc:'oc-videos',     desc:'Video lectures and tutorial playlists' },
+      { k:'practicals', t:'Practicals',  icon:'🔬', ic:'oi-practicals', oc:'oc-practicals', desc:'Lab manuals, practical files and experiments' }
     ];
-    opts.forEach(o=>{
-      const d=document.createElement('div');
-      d.className='card large-panel';
-      d.innerHTML=`<div><div class="card-accent accent-purple">${o.t.split(' ')[0]}</div>
-      <div class="card-title">${o.t}</div>
-      <div class="card-desc">Open ${o.t.toLowerCase()} for ${subj}</div></div>
-      <div class="card-footer"><small class="small">${branch}</small><button class="glow-btn">Open</button></div>`;
-      d.onclick = ()=> location.href = `${o.k}.html`;
+
+    const grid = document.getElementById('optionsGrid');
+    opts.forEach((o, i) => {
+      const d = document.createElement('div');
+      d.className = `option-card ${o.oc} reveal` + (i<4 ? ` reveal-delay-${i}` : '');
+      d.innerHTML = `
+        <div class="option-icon ${o.ic}">${o.icon}</div>
+        <div class="option-title">${o.t}</div>
+        <div class="option-desc">${o.desc} for <strong>${subj}</strong></div>
+        <div style="margin-top:16px">
+          <span style="font-size:12px;color:var(--muted)">${branch} · ${sem}</span>
+        </div>`;
+      d.onclick = () => location.href = o.k + '.html';
       grid.appendChild(d);
     });
   </script>
-  <script type="module" src="js/theme.js"></script>
 </body>
 </html>

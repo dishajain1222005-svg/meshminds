@@ -1,85 +1,88 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Notes</title>
-
-<link rel="stylesheet" href="css/futuristic.css">
-<link rel="stylesheet" href="css/theme.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Notes — MeshMinds</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="stylesheet" href="css/futuristic.css">
+  <link rel="stylesheet" href="css/theme.css">
 </head>
-
 <body>
-<header class="header-hero">
-  <img src="img/hero.png" alt="Hero">
-  <div class="hero-content">
-    <h1>Notes</h1>
-    <p id="ctx"></p>
-  </div>
-</header>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/theme.js"></script>
 
-<main>
-<section style="max-width:1000px;margin:20px auto;padding:0 18px;">
-  <div id="notesList"></div>
-</section>
-</main>
-
-<script type="module">
-import { db } from './js/firebase.js';
-import { collection, query, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
-const course = localStorage.getItem('selectedCourse') || 'B.Tech';
-const branch = localStorage.getItem('selectedBranch');
-const semester = localStorage.getItem('selectedSemester');
-const subject = localStorage.getItem('selectedSubject');
-
-document.getElementById('ctx').innerText =
-  `${course} • ${branch} • ${semester} • ${subject}`;
-
-const out = document.getElementById('notesList');
-
-(async function load() {
-
-  try {
-    const docId = `${course}__${branch}__${semester}__${subject}`;
-    const q = query(collection(db, 'notes', docId, 'items'), orderBy('timestamp','desc'));
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-      out.innerHTML = `<div class="card"><p class="card-desc">No notes uploaded yet.</p></div>`;
-      return;
-    }
-
-    snap.forEach(docSnap => {
-      const d = docSnap.data();
-      const link = d.driveLink || '';
-
-      const el = document.createElement('div');
-      el.className = 'card';
-
-      el.innerHTML = `
-      <div>
-        <div class="card-title">${d.title}</div>
-        <div class="card-desc">${d.description || ''}</div>
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-nav" style="padding:0 0 16px;">
+        <a class="back-btn" href="subject-options.html">← Back</a>
+        <div class="breadcrumb" id="crumb">Loading…</div>
       </div>
+      <div class="page-header-eyebrow">📝 Notes</div>
+      <div class="page-header-title" id="pageTitle">Notes</div>
+      <div class="page-header-sub" id="ctx">Loading…</div>
+    </div>
+  </div>
 
-      <div class="card-footer">
-       
-        ${link ?
-          `<a class="glow-btn" href="preview.html?url=${encodeURIComponent(link)}" target="_blank">Open</a>` :
-          `<span class="small">No link</span>`}
-      </div>`;
+  <div class="page-content" style="max-width:860px">
+    <div id="notesList">
+      <div class="loading-pulse"><span></span><span></span><span></span></div>
+    </div>
+  </div>
 
-      out.appendChild(el);
-    });
+  <footer class="site-footer">© 2024 MeshMinds</footer>
+  <script src="js/ui.js" defer></script>
+  <script type="module">
+    import { db } from './js/firebase.js';
+    import { collection, query, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-  } catch (e) {
-    out.innerHTML = `<div class="card"><p class="card-desc">Error: ${e.message}</p></div>`;
-  }
+    const course   = localStorage.getItem('selectedCourse')   || 'B.Tech';
+    const branch   = localStorage.getItem('selectedBranch')   || '';
+    const semester = localStorage.getItem('selectedSemester') || '';
+    const subject  = localStorage.getItem('selectedSubject')  || '';
 
-})();
-</script>
+    document.getElementById('pageTitle').innerText = subject + ' — Notes';
+    document.getElementById('ctx').innerText       = `${branch} · ${semester} · ${subject}`;
+    document.getElementById('crumb').innerHTML     =
+      `<span>${course}</span> → <span>${branch}</span> → <span>${semester}</span> → <span>${subject}</span> → Notes`;
 
-<script type="module" src="js/theme.js"></script>
+    const out = document.getElementById('notesList');
+
+    (async function load() {
+      try {
+        const docId = `${course}__${branch}__${semester}__${subject}`;
+        const snap  = await getDocs(query(collection(db,'notes',docId,'items'), orderBy('timestamp','desc')));
+
+        if (snap.empty) { out.innerHTML = emptyState('No notes uploaded yet.'); return; }
+
+        out.innerHTML = '';
+        snap.forEach(ds => {
+          const d    = ds.data();
+          const link = d.driveLink || '';
+          const el   = document.createElement('div');
+          el.className = 'resource-card reveal';
+          el.innerHTML = `
+            <div class="resource-card-left">
+              <div class="resource-badge badge-notes">📝 Notes</div>
+              <div class="resource-title">${esc(d.title)}</div>
+              ${d.description ? `<div class="resource-desc">${esc(d.description)}</div>` : ''}
+              ${d.uploaderName ? `<div class="resource-meta" style="margin-top:6px">By ${esc(d.uploaderName)}</div>` : ''}
+            </div>
+            <div class="resource-actions">
+              ${link
+                ? `<a class="glow-btn" href="preview.html?url=${encodeURIComponent(link)}&title=${encodeURIComponent(d.title)}" target="_blank">View</a>`
+                : `<span class="small">No file</span>`}
+            </div>`;
+          out.appendChild(el);
+        });
+        triggerReveal();
+      } catch(e) { out.innerHTML = errorState(e.message); }
+    })();
+
+    function emptyState(msg) { return `<div class="empty-state"><div class="empty-icon">📭</div><p>${msg}</p></div>`; }
+    function errorState(msg) { return `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${esc(msg)}</p></div>`; }
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function triggerReveal() { document.querySelectorAll('.reveal').forEach((el,i) => { setTimeout(()=>el.classList.add('visible'), i*60); }); }
+  </script>
 </body>
 </html>

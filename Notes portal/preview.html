@@ -1,104 +1,111 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viewer</title>
-
-<link rel="stylesheet" href="css/futuristic.css">
-<link rel="stylesheet" href="css/theme.css">
-
-<style>
-body {
-  background: var(--bg);
-  color: var(--text);
-  margin: 0;
-}
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 14px 20px;
-  background: var(--card);
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-}
-
-.top-bar button {
-  background: var(--accent);
-  color: #fff;
-  padding: 8px 15px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-.viewer-box {
-  width: 100%;
-  height: calc(100vh - 70px);
-  background: #000;
-}
-
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Preview — MeshMinds</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="stylesheet" href="css/futuristic.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    .preview-wrap { display: flex; flex-direction: column; height: 100vh; padding-top: 0; }
+    .preview-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 18px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      min-height: 56px;
+    }
+    .preview-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .preview-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+    .preview-frame { flex: 1; width: 100%; border: none; background: #111; min-height: 0; }
+    .preview-err { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: var(--muted); padding: 40px; }
+  </style>
 </head>
-
 <body>
+  <script type="module" src="js/theme.js"></script>
+  <div class="preview-wrap">
+    <div class="preview-bar">
+      <button class="back-btn" onclick="history.back()">← Back</button>
+      <div class="preview-title" id="titleTxt">Preview</div>
+      <div class="preview-actions">
+        <button data-theme="light" class="glow-btn secondary btn-sm" style="padding:7px 10px;">🌞</button>
+        <button data-theme="dark"  class="glow-btn secondary btn-sm" style="padding:7px 10px;">🌙</button>
+        <a id="downloadBtn" class="glow-btn btn-sm" href="#" target="_blank" rel="noopener">⬇ Download</a>
+      </div>
+    </div>
+    <iframe id="viewerFrame" class="preview-frame" title="Document preview" allowfullscreen></iframe>
+    <div id="errState" class="preview-err" style="display:none">
+      <div style="font-size:52px;opacity:.5">⚠️</div>
+      <p>Cannot preview this file. Try downloading it.</p>
+    </div>
+  </div>
 
-<div class="top-bar">
-  <button onclick="history.back()">⬅ Back</button>
-  <div style="font-size:18px;font-weight:600;" id="titleTxt">Preview</div>
-  <a id="downloadBtn" class="glow-btn" href="#" download target="_blank">Download</a>
-</div>
+  <script>
+    // Wire theme buttons manually since navbar isn't here
+    document.querySelectorAll('[data-theme]').forEach(b => {
+      b.addEventListener('click', () => {
+        document.documentElement.setAttribute('data-theme', b.dataset.theme);
+        localStorage.setItem('theme', b.dataset.theme);
+      });
+    });
 
-<div class="viewer-box">
-  <iframe id="viewerFrame"></iframe>
-</div>
+    const params  = new URLSearchParams(location.search);
+    const fileUrl = params.get('url') || '';
+    const title   = params.get('title') || 'Document';
 
-<script type="module" src="js/theme.js"></script>
+    document.getElementById('titleTxt').innerText = title;
+    document.title = title + ' — MeshMinds';
 
-<script>
-// get link from URL
-const urlParams = new URLSearchParams(window.location.search);
-const fileUrl = urlParams.get("url");
-const title = urlParams.get("title") || "Document";
+    const frame  = document.getElementById('viewerFrame');
+    const errEl  = document.getElementById('errState');
+    const dlBtn  = document.getElementById('downloadBtn');
 
-document.getElementById("titleTxt").innerText = title;
+    if (!fileUrl) {
+      frame.style.display = 'none';
+      errEl.style.display = 'flex';
+      dlBtn.style.display = 'none';
+    } else {
+      dlBtn.href = fileUrl;
+      let src = '';
 
-// set viewer + download link
-document.getElementById("downloadBtn").href = fileUrl;
+      if (fileUrl.includes('drive.google.com')) {
+        const id = getDriveId(fileUrl);
+        src = id ? `https://drive.google.com/file/d/${id}/preview` : fileUrl;
+      } else if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(fileUrl)) {
+        frame.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = fileUrl;
+        img.alt = title;
+        img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;flex:1;padding:24px;background:var(--bg-2);';
+        frame.parentElement.insertBefore(img, frame.nextSibling);
+      } else {
+        src = fileUrl;
+      }
 
-// auto-embed Google Drive / PDF / images
-let viewer = document.getElementById("viewerFrame");
+      if (src) frame.src = src;
+    }
 
-// CASE 1 → PDF / drive link
-if (fileUrl.includes("drive.google.com")) {
-    viewer.src = "https://drive.google.com/file/d/" +
-                 extractDriveId(fileUrl) +
-                 "/preview";
-}
-else if (fileUrl.endsWith(".pdf")) {
-    viewer.src = fileUrl;
-}
-// CASE 2 → Image
-else if (fileUrl.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    viewer.src = fileUrl;
-}
-// CASE 3 → Fallback
-else {
-    viewer.src = fileUrl;
-}
-
-// Extract drive ID automatically
-function extractDriveId(link) {
-    let match = link.match(/[-\w]{25,}/);
-    return match ? match[0] : "";
-}
-</script>
-
+    function getDriveId(link) {
+      const m = link.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
+      if (m) return m[1];
+      try { return new URL(link).searchParams.get('id') || ''; } catch(_){ return ''; }
+    }
+  </script>
 </body>
 </html>

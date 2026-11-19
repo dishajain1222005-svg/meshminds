@@ -1,59 +1,114 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Choose Branch</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Select Branch — MeshMinds</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
   <link rel="stylesheet" href="css/futuristic.css">
   <link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
-  <header class="header-hero">
-    <img src="img/hero.png" alt="Hero">
-    <div class="hero-content">
-      <h1>Select Branch</h1>
-      <p id="selectedCourse" style="color:var(--muted);"></p>
+  <script type="module" src="js/navbar.js"></script>
+  <script type="module" src="js/theme.js"></script>
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-nav" style="padding:0 0 16px;">
+        <a class="back-btn" href="index.html">← Home</a>
+        <div class="breadcrumb"><span id="courseCrumb">B.Tech</span> → Branch</div>
+      </div>
+      <div class="page-header-eyebrow">Step 1 of 3</div>
+      <div class="page-header-title">Select Your Branch</div>
+      <div class="page-header-sub" id="selectedCourse">B.Tech</div>
     </div>
-  </header>
+  </div>
 
-  <main>
-    <section class="grid">
+  <div class="page-content">
+    <div class="grid grid-auto" style="gap:20px" id="branchGrid">
+
       <div id="CSE" class="card large-panel" onclick="chooseBranch('CSE')">
-        <div><div class="card-accent accent-blue">CSE</div><div class="card-title">Computer Science & Engineering</div><div class="card-desc">Programming, Data Structures, Algorithms</div></div>
-        <div class="card-footer"><small class="small">Core</small><button class="glow-btn">Open</button></div>
+        <div class="card-body">
+          <div class="card-accent accent-blue">CSE</div>
+          <div class="card-title">Computer Science &amp; Engineering</div>
+          <div class="card-desc">Programming, Data Structures, Algorithms, Operating Systems and more.</div>
+        </div>
+        <div class="card-foot">
+          <small class="small">Core</small>
+          <button class="glow-btn" onclick="event.stopPropagation();chooseBranch('CSE')">Select</button>
+        </div>
       </div>
-      <div id="IT" class="card large-panel" onclick="chooseBranch('IT')">
-        <div><div class="card-accent accent-green">IT</div><div class="card-title">Information Technology</div><div class="card-desc">Software systems & networks</div></div>
-        <div class="card-footer"><small class="small">Core</small><button class="glow-btn">Open</button></div>
-      </div>
-      <div id="AIML" class="card large-panel" onclick="chooseBranch('AIML')">
-        <div><div class="card-accent accent-purple">AIML</div><div class="card-title">AI & Machine Learning</div><div class="card-desc">ML, Deep Learning & AI</div></div>
-        <div class="card-footer"><small class="small">Specialization</small><button class="glow-btn">Open</button></div>
-      </div>
-      <div id="AIDS" class="card large-panel" onclick="chooseBranch('AIDS')">
-        <div><div class="card-accent accent-orange">AIDS</div><div class="card-title">AI & Data Science</div><div class="card-desc">Data analytics & ML</div></div>
-        <div class="card-footer"><small class="small">Specialization</small><button class="glow-btn">Open</button></div>
-      </div>
-      <div id="VLSI" class="card large-panel" onclick="chooseBranch('VLSI')">
-        <div><div class="card-accent accent-blue">VLSI</div><div class="card-title">VLSI</div><div class="card-desc">Chip design & hardware</div></div>
-        <div class="card-footer"><small class="small">Hardware</small><button class="glow-btn">Open</button></div>
-      </div>
-    </section>
-  </main>
 
+      <div id="IT" class="card large-panel" onclick="chooseBranch('IT')">
+        <div class="card-body">
+          <div class="card-accent accent-green">IT</div>
+          <div class="card-title">Information Technology</div>
+          <div class="card-desc">Software systems, networks, web technologies and IT engineering.</div>
+        </div>
+        <div class="card-foot">
+          <small class="small">Core</small>
+          <button class="glow-btn" onclick="event.stopPropagation();chooseBranch('IT')">Select</button>
+        </div>
+      </div>
+
+      <div id="AIML" class="card large-panel" onclick="chooseBranch('AIML')">
+        <div class="card-body">
+          <div class="card-accent accent-purple">AIML</div>
+          <div class="card-title">AI &amp; Machine Learning</div>
+          <div class="card-desc">Machine Learning, Deep Learning, Neural Networks and AI foundations.</div>
+        </div>
+        <div class="card-foot">
+          <small class="small">Specialization</small>
+          <button class="glow-btn" onclick="event.stopPropagation();chooseBranch('AIML')">Select</button>
+        </div>
+      </div>
+
+      <div id="AIDS" class="card large-panel" onclick="chooseBranch('AIDS')">
+        <div class="card-body">
+          <div class="card-accent accent-orange">AIDS</div>
+          <div class="card-title">AI &amp; Data Science</div>
+          <div class="card-desc">Data analytics, visualization, machine learning and data engineering.</div>
+        </div>
+        <div class="card-foot">
+          <small class="small">Specialization</small>
+          <button class="glow-btn" onclick="event.stopPropagation();chooseBranch('AIDS')">Select</button>
+        </div>
+      </div>
+
+      <div id="VLSI" class="card large-panel" onclick="chooseBranch('VLSI')">
+        <div class="card-body">
+          <div class="card-accent accent-cyan">VLSI</div>
+          <div class="card-title">VLSI Design</div>
+          <div class="card-desc">Chip design, CMOS technology, microprocessors and hardware engineering.</div>
+        </div>
+        <div class="card-foot">
+          <small class="small">Hardware</small>
+          <button class="glow-btn" onclick="event.stopPropagation();chooseBranch('VLSI')">Select</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">© 2024 MeshMinds</footer>
+  <script src="js/ui.js" defer></script>
   <script>
-    document.getElementById('selectedCourse').innerText = localStorage.getItem('selectedCourse') || 'B.Tech';
-    function chooseBranch(b){
-      document.querySelectorAll('.card').forEach(c=>c.classList.remove('card-selected'));
-      const el = document.getElementById(b); if(el) el.classList.add('card-selected');
+    const course = localStorage.getItem('selectedCourse') || 'B.Tech';
+    document.getElementById('selectedCourse').innerText = course;
+    document.getElementById('courseCrumb').innerText    = course;
+
+    function chooseBranch(b) {
+      document.querySelectorAll('#branchGrid .card').forEach(c => c.classList.remove('card-selected'));
+      const el = document.getElementById(b);
+      if (el) el.classList.add('card-selected');
       localStorage.setItem('selectedBranch', b);
-      setTimeout(()=> location.href = 'semester.html', 140);
+      setTimeout(() => location.href = 'semester.html', 160);
     }
-    document.addEventListener('DOMContentLoaded', ()=> {
+
+    document.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('selectedBranch');
-      if(saved) { const el=document.getElementById(saved); if(el) el.classList.add('card-selected'); }
+      if (saved) { const el = document.getElementById(saved); if (el) el.classList.add('card-selected'); }
     });
   </script>
-  <script type="module" src="js/theme.js"></script>
 </body>
 </html>
